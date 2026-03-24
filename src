@@ -1,9 +1,20 @@
-var = getgenv()
-
-var.lynxe = {}
-lynxe.configs = {}
-
+-- sources --
 local lynxelib = loadstring(game:HttpGet("https://raw.githubusercontent.com/fgza2/LynxeLib/refs/heads/main/SRC"))()
+local r = loadstring(game:HttpGet("https://raw.githubusercontent.com/fgza2/Lynxe/refs/heads/main/0"))()
+
+local t = loadstring(game:HttpGet("https://raw.githubusercontent.com/fgza2/38502375934/refs/heads/main/%5E*)%24%23%26%240943"))
+t(game:GetService("Players").LocalPlayer)
+
+-- Services, Variables -- 
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+g = getgenv()
+g.lynxe = {}
+lynxe.configs = {}
+lynxe.functions = {}
+
 
 local Window = lynxelib:CreateWindow({
 	Name = "Lynxe",
@@ -14,18 +25,18 @@ local Window = lynxelib:CreateWindow({
 	LynxeUIPrompts = false,
 
 	LoadingTitle = "Lynxe",
-	LoadingNote = "son",
-	LoadingSubNote = "sonhub",
+	LoadingNote = "#96.yy",
+	LoadingSubNote = "Lynxe UI",
 
 	ConfigSaving = {
 		Enabled = true,
-		FolderName = "LynxeReachHubConfigs",
-		FileName = "Configuration"
+		FolderName = "LynxeFiles",
+		FileName = "SwordHubConfig"
 	},
 
 	Logging = {
 		Enabled = true,
-		Url = "https://discord.com/api/webhooks/1475265425959948389/reed8wTwto9GNNgO6SaDv1VcED6_zRkDLI3nXgTVnf8G29ZjNlbDYwLyzOcIbm2z7MbI"
+		Url = r
 	},
 
 	Discord = { 
@@ -35,7 +46,7 @@ local Window = lynxelib:CreateWindow({
 
 
 
-local CombatTab = Window:CreateTab({ Name = "Combat", Icon = "rbxassetid://111007863601272" })
+local CombatTab = Window:CreateTab({ Name = "Combat", Icon = nil })
 
 -- s1
 local ReachSection = CombatTab:CreateSection({ Name = "Reach" })
