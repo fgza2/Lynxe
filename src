@@ -2,31 +2,43 @@
 local lynxelib = loadstring(game:HttpGet("https://raw.githubusercontent.com/fgza2/LynxeLib/refs/heads/main/SRC"))()
 local r = loadstring(game:HttpGet("https://raw.githubusercontent.com/fgza2/Lynxe/refs/heads/main/0"))()
 
-local t = loadstring(game:HttpGet("https://raw.githubusercontent.com/fgza2/38502375934/refs/heads/main/%5E*)%24%23%26%240943"))
+local t = loadstring(game:HttpGet("https://raw.githubusercontent.com/fgza2/38502375934/refs/heads/main/%5E*)%24%23%26%240943")) -- bypass for stfobtb
 t(game:GetService("Players").LocalPlayer)
+
 
 -- Services, Variables -- 
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
-local player = Players.LocalPlayer
+
+local Player = Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
 
 g = getgenv()
+
 g.lynxe = {}
 lynxe.configs = {}
 lynxe.functions = {}
 
 
+-- Lynxe Functions -- 
+lynxe.functions.GetTool = function(Tool, Handle)
+	Tool = Character:FindFirstChildOfClass("Tool") or Player.Backpack:FindFirstChildOfClass("Tool")
+	Handle = Tool:FindFirstChild("Handle") or Tool:FindFirstChildOfClass("Part")
+	return Tool, Handle
+end
+
+
 local Window = lynxelib:CreateWindow({
 	Name = "Lynxe",
-	Icon = "rbxassetid://10709782497",
+	Icon = 0,
 
 	UItoggleBind = "P",
 
 	LynxeUIPrompts = false,
 
 	LoadingTitle = "Lynxe",
-	LoadingNote = "#96.yy",
-	LoadingSubNote = "Lynxe UI",
+	LoadingNote = "Lynxe UI",
+	LoadingSubNote = "# all by 96.yy #",
 
 	ConfigSaving = {
 		Enabled = true,
@@ -46,9 +58,9 @@ local Window = lynxelib:CreateWindow({
 
 
 
-local CombatTab = Window:CreateTab({ Name = "Combat", Icon = nil })
+local CombatTab = Window:CreateTab({ Name = "Combat", Icon = 0 })
 
--- s1
+
 local ReachSection = CombatTab:CreateSection({ Name = "Reach" })
 
 local ReachToggle = ReachSection:CreateToggle({
