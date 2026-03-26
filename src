@@ -1,33 +1,271 @@
 -- sources --
 local lynxelib = loadstring(game:HttpGet("https://raw.githubusercontent.com/fgza2/LynxeLib/refs/heads/main/SRC"))()
 local r = loadstring(game:HttpGet("https://raw.githubusercontent.com/fgza2/Lynxe/refs/heads/main/0"))()
-
-local t = loadstring(game:HttpGet("https://raw.githubusercontent.com/fgza2/38502375934/refs/heads/main/%5E*)%24%23%26%240943")) -- bypass for stfobtb
-t(game:GetService("Players").LocalPlayer)
-
+local t = loadstring(game:HttpGet("https://raw.githubusercontent.com/fgza2/38502375934/refs/heads/main/%5E*)%24%23%26%240943"))(game:GetService("Players").LocalPlayer)
 
 -- Services, Variables -- 
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 
-local Player = Players.LocalPlayer
-local Character = Player.Character or Player.CharacterAdded:Wait()
+local player = Players.LocalPlayer
+local Character = player.Character or player.CharacterAdded:Wait()
 
 g = getgenv()
 
 g.lynxe = {}
-lynxe.configs = {}
 lynxe.functions = {}
+lynxe.features = {}
+
+lynxe._cts = {}
+lynxe._temp = {}
+
+
+-- Configuration/Structure --
+lynxe.configs = {
+	SpoofMethod = "metatable",
+	
+	combat = {
+		reach = {
+			enabled = false,
+			range = nil,
+			method = nil,
+			methods = {"TouchInterest", "C-Bring(Streamable)", "C-Bring"}
+		},
+		
+		hitbox = {
+			enabled = nil,
+			method = nil,
+			size = {X = 0, Y = 0, Z = 0}
+		}
+	},
+	
+	player = {
+		
+	}
+}
+
+
+if hookmetamethod or getrawmetatable then
+	if hookmetamethod then
+		lynxe.configs.SpoofMethod = "metamethod"
+	elseif getrawmetatable and newcclosure then
+		lynxe.configs.SpoofMethod = "metatable"
+	else
+		lynxe.configs.SpoofMethod = "none"
+	end
+else
+	lynxe.configs.combat.reach.methods = {"C-Bring(Streamable)", "C-Bring"}
+end
+
+if getconnections then
+	for _, v in pairs(getconnections(game:GetService("ScriptContext").Error)) do
+		pcall(function()
+			v:Disconnect()
+		end)
+	end
+end
+
+if UserInputService.TouchEnabled then
+	lynxe.configs.spoofMethod = "metatable"
+end
 
 
 -- Lynxe Functions -- 
 lynxe.functions.GetTool = function(Tool, Handle)
 	Tool = Character:FindFirstChildOfClass("Tool") or Player.Backpack:FindFirstChildOfClass("Tool")
 	Handle = Tool:FindFirstChild("Handle") or Tool:FindFirstChildOfClass("Part")
+	if not Tool or not Handle then return end
+	
+	if Handle then
+		Handle.Massless = true
+		Handle.CanCollide = false
+		
+		pcall(function()
+			for i,v in pairs(getconnections(Handle.Changed)) do
+				v:Disconnect()
+			end
+		end)
+	end
 	return Tool, Handle
 end
 
+lynxe.functions.NewConnection = function(key, object, event, callback)
+	lynxe._cts[key] = object[event]:Connect(callback)
+	return lynxe._cts[key]
+end
 
+lynxe.functions.RemoveConnection = function(key)
+	lynxe._cts[key]:Disconnect()
+	lynxe._cts[key] = nil
+end
+
+-- credits to brew methods
+lynxe.spoof = function(self, index, property, value)
+	if not self._temp[index] then
+		self._temp[index] = {}
+	end
+	
+	if self._temp[index][property] then
+		return { StatusCode = 409, Message = "Resource already exists" }
+	end
+	
+	self._temp[index][property] = value
+	return { StatusCode = 200, Message = "Spoof applied" }
+end
+
+lynxe.protectInstance = function(self, instance)
+	instance.Name = string.sub(string.gsub(game:GetService("HttpService"):GenerateGUID(false), "-", ""), 1, math.random(25, 30))
+	instance.Archivable = false
+	lynxe:spoof(instance, "Parent", nil)
+	lynxe:spoof(instance, "Name", nil)
+	lynxe:spoof(instance, "ClassName", nil)
+end
+
+
+-- Lynxe features --
+lynxe.features.Reach = function()
+	if not lynxe.configs.combat.reach.enabled then
+		if table.find(lynxe._cts, "ReachLoop") then 
+			lynxe.functions:RemoveConnection("ReachLoop") 
+		end
+		return	
+	else
+		local Tool, Handle = lynxe.functions:GetTool()
+		
+		lynxe.functions:NewConnection("ReachLoop", RunService, "Heartbeat", function()
+			if lynxe.configs.combat.reach.method == "TouchInterest" then
+				
+				local HandlePos = Handle.Position
+				local Forward = Handle.CFrame.LookVector
+
+				for _, Player in pairs(Players:GetPlayers()) do
+					if Player.Name == player.Name then continue end
+
+					local character = Player.Character
+					if not character then continue end
+					local RootPart = character:FindFirstChild("HumanoidRootPart")
+
+					local ToolDistance = (RootPart.Position - HandlePos).Unit
+					local dot = Forward:Dot(ToolDistance)
+
+					local clamp = math.clamp(dot, 0, lynxe.configs.combat.reach.range)
+					local closest = HandlePos + Forward * clamp
+
+					local Distance = (RootPart.Position - closest).Magnitude
+
+					if Distance <= lynxe.configs.combat.reach.range then
+						firetouchinterest(RootPart, Handle, 0)
+					else
+						firetouchinterest(RootPart, Handle, 1)
+					end 
+				end
+			elseif lynxe.configs.combat.reach.method == "C-Bring(Streamable)" then
+				
+				local HandlePos = Handle.Position
+				local Forward = Handle.CFrame.LookVector
+
+				for _, Player in pairs(Players:GetPlayers()) do
+					if Player.Name == player.Name then continue end
+
+					local character = Player.Character
+					if not character then continue end
+					local RootPart = character:FindFirstChild("HumanoidRootPart")
+
+					local ToolDistance = (RootPart.Position - HandlePos).Unit
+					local dot = Forward:Dot(ToolDistance)
+
+					local clamp = math.clamp(dot, 0, lynxe.configs.combat.reach.range)
+					local closest = HandlePos + Forward * clamp
+
+					local Distance = (RootPart.Position - closest).Magnitude
+
+					if Distance <= lynxe.configs.combat.reach.range then
+						for _, v in pairs(character:GetChildren()) do
+							if v:IsA("BasePart") and v.Name == "Left Arm" or v.Name == "Right Arm" then
+								pcall(function()
+									if v and v.Name == "Left Arm" then
+										local LMotor = character:FindFirstChild("Torso")["Left Shoulder"]:Clone()
+										v.Parent = workspace
+										v.CanCollide = false
+										v.Anchored = true
+										v:BreakJoints()
+										
+										local fakeLArm = v:Clone()
+										fakeLArm.Parent = character
+										fakeLArm.Anchored = false
+										LMotor.Part1 = fakeLArm
+										LMotor.Parent = character.Torso
+										
+										v:ClearAllChildren()
+										v.Transparency = 1
+										v.Parent = character
+										v.Name = "B Left Arm"
+										
+									elseif v and v.Name == "Right Arm" then
+										local RMotor = character:FindFirstChild("Torso")["Right Shoulder"]:Clone()
+										v.Parent = workspace
+										v.CanCollide = false
+										v.Anchored = true
+										v:BreakJoints()
+										
+										local fakeRArm = v:Clone()
+										fakeRArm.Parent = character
+										fakeRArm.Anchored = false
+										RMotor.Part1 = fakeRArm
+										RMotor.Parent = character.Torso
+										
+										v:ClearAllChildren()
+										v.Transparency = 1
+										v.Parent = character
+										v.Name = "B Right Arm"
+									end
+									v.CFrame = Handle.CFrame
+								end)
+							end
+						end
+					end 
+				end
+			elseif lynxe.configs.combat.reach.method == "C-Bring" then
+				
+				local HandlePos = Handle.Position
+				local Forward = Handle.CFrame.LookVector
+
+				for _, Player in pairs(Players:GetPlayers()) do
+					if Player.Name == player.Name then continue end
+
+					local character = Player.Character
+					if not character then continue end
+					local RootPart = character:FindFirstChild("HumanoidRootPart")
+
+					local ToolDistance = (RootPart.Position - HandlePos).Unit
+					local dot = Forward:Dot(ToolDistance)
+
+					local clamp = math.clamp(dot, 0, lynxe.configs.combat.reach.range)
+					local closest = HandlePos + Forward * clamp
+
+					local Distance = (RootPart.Position - closest).Magnitude
+
+					if Distance <= lynxe.configs.combat.reach.range then
+						for _, v in pairs(character:GetChildren()) do
+							if v and v:IsA("BasePart") and v.Name == "Right Leg" or v.Name == "Right Arm" or v.Name == "Left Leg" or v.Name == "Left Arm" then
+								v:BreakJoints()
+								lynxe:Spoof(v, "Anchored", true)
+								lynxe:Spoof(v, "CanCollide", false)
+								lynxe:Spoof(v, "Transparency", 1)
+								v.CFrame = Handle.CFrame
+							end
+						end
+					end 
+				end
+
+			end
+		end)
+	end
+end
+
+
+-- UI --
 local Window = lynxelib:CreateWindow({
 	Name = "Lynxe",
 	Icon = 0,
@@ -38,7 +276,7 @@ local Window = lynxelib:CreateWindow({
 
 	LoadingTitle = "Lynxe",
 	LoadingNote = "Lynxe UI",
-	LoadingSubNote = "# all by 96.yy #",
+	LoadingSubNote = "all by #96.yy",
 
 	ConfigSaving = {
 		Enabled = true,
@@ -60,17 +298,18 @@ local Window = lynxelib:CreateWindow({
 
 local CombatTab = Window:CreateTab({ Name = "Combat", Icon = 0 })
 
-
+--[[ Section 1 ]]--
 local ReachSection = CombatTab:CreateSection({ Name = "Reach" })
-
 local ReachToggle = ReachSection:CreateToggle({
 	Name = "Reach",
 	CurrentValue = false,
 	Flag = "ReachToggle", 
 	Callback = function(Value) 
-
+		lynxe.configs.combat.reach.enabled = Value
+		lynxe.features.Reach()
 	end
 })
+
 local ReachSlider = ReachSection:CreateSlider({
 	Name = "Range",
 	CurrentValue = 5,
@@ -78,67 +317,118 @@ local ReachSlider = ReachSection:CreateSlider({
 	Increment = 0.1,
 	Flag = "ReachSlider",
 	Callback = function(Value)
-
+		lynxe.configs.combat.reach.range = Value
 	end
 })
+
 local ReachMethodDropdown = ReachSection:CreateDropdown({
 	Name = "Method",
-	Options = {"TouchInterest", "C-bring", "Tool-TP"},  
+	Options = lynxe.configs.combat.reach.methods,  
 	CurrentOption = {"TouchInterest"},
 	Flag = "ReachMethodDropdown",
 	Callback = function(Option)
-
+		lynxe.configs.combat.reach.method = Option
 	end
 })
 
 
--- s2
-local ReachSection2 = CombatTab:CreateSection({ Name = "More Reach" })
-
-local ReachToggle2 = ReachSection2:CreateToggle({
-	Name = "Reach",
+--[[ Section 2 ]]--
+local HitboxSection = CombatTab:CreateSection({ Name = "Hitbox" })
+local HitboxToggle = HitboxSection:CreateToggle({
+	Name = "Modify Hitbox",
 	CurrentValue = false,
 	Flag = "ReachToggle2", 
 	Callback = function(Value) 
-
+		lynxe.configs.combat.hitbox.enabled = Value
 	end
 })
-local ReachMethodDropdown2 = ReachSection2:CreateDropdown({
+local HtiboxMethodDropdown = HitboxSection:CreateDropdown({
 	Name = "Method",
 	Options = {"Hitbox", "Handle", "Grip"},
 	CurrentOption = {"Hitbox"},
 	Flag = "ReachMethodDropdown2",
 	Callback = function(Option)
-
+		lynxe.configs.combat.hitbox.method = Option
 	end
 })
-local ReachSliderX = ReachSection2:CreateSlider({
+local ReachSliderX = HitboxSection:CreateSlider({
 	Name = "X-Range",
 	CurrentValue = 5,
 	Range = {min = 1, max = 30},
 	Increment = 0.1,
 	Flag = "ReachSliderX",
 	Callback = function(Value)
-
+		lynxe.configs.combat.hitbox.size.X = Value
 	end
 })
-local ReachSliderY = ReachSection2:CreateSlider({
+local ReachSliderY = HitboxSection:CreateSlider({
 	Name = "Y-Range",
 	CurrentValue = 5,
 	Range = {min = 1, max = 30},
 	Increment = 0.1,
 	Flag = "ReachSliderY",
 	Callback = function(Value)
-
+		lynxe.configs.combat.hitbox.size.Y = Value
 	end
 })
-local ReachSliderZ = ReachSection2:CreateSlider({
+local ReachSliderZ = HitboxSection:CreateSlider({
 	Name = "Z-Range",
 	CurrentValue = 5,
 	Range = {min = 1, max = 30},
 	Increment = 0.1,
 	Flag = "ReachSliderZ",
 	Callback = function(Value)
-
+		lynxe.configs.combat.hitbox.size.Z = Value
 	end
 })
+
+
+
+
+lynxe.functions.collect = function()
+	task.spawn(function()
+		while task.wait(30) do
+			local cleaned = 0
+
+			for index, _ in pairs(lynxe._temp) do
+				if typeof(index) == "Instance" and index.Parent == nil then
+					lynxe._temp[index] = nil
+					cleaned += 1
+				end
+			end
+		end
+	end)
+end
+lynxe.functions:collect()
+
+
+if lynxe.configs.spoofMethod == "metamethod" then
+	if hookmetamethod then
+		local old
+		old = hookmetamethod(game, "__index", function(i, v)
+			if not checkcaller() then
+				local instTable = lynxe._temp[i]
+				if instTable and instTable[v] ~= nil then
+					return instTable[v]
+				end
+			end
+			return old(i, v)
+		end)
+	end
+elseif lynxe.configs.spoofMethod == "metatable" then
+	if getrawmetatable and setreadonly and newcclosure then
+		local mt = getrawmetatable(game)
+		setreadonly(mt, false)
+		local oldIndex = mt.__index
+
+		mt.__index = newcclosure(function(i, v)
+			if not checkcaller() then
+				local instTable = lynxe._temp[i]
+				if instTable and instTable[v] ~= nil then
+					return instTable[v]
+				end
+			end
+			return oldIndex(i, v)
+		end)
+	end
+end
