@@ -127,13 +127,13 @@ end
 lynxe.features.Reach = function()
 	if not lynxe.configs.combat.reach.enabled then
 		if table.find(lynxe._cts, "ReachLoop") then 
-			lynxe.functions:RemoveConnection("ReachLoop") 
+			lynxe.functions.RemoveConnection("ReachLoop") 
 		end
 		return	
 	else
 		local Tool, Handle = lynxe.functions:GetTool()
 		
-		lynxe.functions:NewConnection("ReachLoop", RunService, "Heartbeat", function()
+		lynxe.functions.NewConnection("ReachLoop", RunService, "Heartbeat", function()
 			if lynxe.configs.combat.reach.method == "TouchInterest" then
 				
 				local HandlePos = Handle.Position
@@ -285,7 +285,7 @@ local Window = lynxelib:CreateWindow({
 	},
 
 	Logging = {
-		Enabled = true,
+		Enabled = false,
 		Url = r
 	},
 
