@@ -73,7 +73,7 @@ end
 
 -- Lynxe Functions -- 
 lynxe.functions.GetTool = function(Tool, Handle)
-	Tool = Character:FindFirstChildOfClass("Tool") or player.Backpack:FindFirstChildOfClass("Tool")
+	Tool = Character:FindFirstChildOfClass("Tool")
 	Handle = Tool:FindFirstChild("Handle") or Tool:FindFirstChildOfClass("Part")
 	if not Tool or not Handle then return end
 	
@@ -132,8 +132,11 @@ lynxe.features.Reach = function()
 		return	
 	else
 		local Tool, Handle = lynxe.functions:GetTool()
+		if not Tool or not Handle then return end
 		
 		lynxe.functions.NewConnection("ReachLoop", RunService, "Heartbeat", function()
+			if not Handle or not Handle.Parent then return end
+			
 			if lynxe.configs.combat.reach.method == "TouchInterest" then
 				
 				local HandlePos = Handle.Position
