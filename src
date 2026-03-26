@@ -224,9 +224,7 @@ lynxe.features.Reach = function()
 								elseif v and v.Name == "Right Arm" then
 									if v.Parent:FindFirstChild("B Right Arm") then return end
 
-									local RMotor = character:FindFirstChild("Torso")["Right Shoulder"]:Clone()
-									local RGrip = v:FindFirstChild("RightGrip"):Clone()
-									
+									local RMotor = character.Torso["Right Shoulder"]:Clone()
 									v.Parent = workspace
 									v.CanCollide = false
 									v.Anchored = true
@@ -238,16 +236,21 @@ lynxe.features.Reach = function()
 									RMotor.Part1 = fakeRArm
 									RMotor.Parent = character.Torso
 									
-									RGrip.Part0 = fakeRArm
-									RGrip.Part1 = pHandle
-									RGrip.Parent = fakeRArm
-									
 									v:ClearAllChildren()
 									v.Transparency = 1
 									v.Parent = character
 									v.Name = "B Right Arm"
 								end
-
+								
+								if v.Name == "B Right Arm" then
+									if v:FindFirstChild("RightGrip") then
+										local Grip = v:FindFirstChild("RightGrip")
+										Grip.Part0 = v
+										Grip.Part1 = pHandle
+										Grip.Parent = character:FindFirstChild("Right Arm")
+									end
+								end
+								
 								if v.Name == "B Left Arm" or v.Name == "B Right Arm" then
 									v.CFrame = Handle.CFrame
 								end
@@ -455,8 +458,7 @@ lynxe.functions:collect()
 
 if lynxe.configs.spoofMethod == "metamethod" then
 	if hookmetamethod then
-		local old
-		old = hookmetamethod(game, "__index", function(i, v)
+		local old; old = hookmetamethod(game, "__index", function(i, v)
 			if not checkcaller() then
 				local instTable = lynxe._temp[i]
 				if instTable and instTable[v] ~= nil then
