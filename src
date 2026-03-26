@@ -243,18 +243,16 @@ lynxe.features.Reach = function()
 									RMotor.Part1 = fakeRArm
 									RMotor.Parent = character.Torso
 									
+									if g.grip then
+										g.grip.Part0 = fakeRArm
+										g.grip.Part1 = pHandle
+										g.grip.Parent = fakeRArm
+									end
+									
 									v:ClearAllChildren()
 									v.Transparency = 1
 									v.Parent = character
 									v.Name = "B Right Arm"
-								end
-								
-								if v:IsA("BasePart") and v.Name == "Right Arm" then
-									if not v:FindFirstChild("RightGrip") then
-										g.grip.Part0 = v
-										g.grip.Part1 = pHandle
-										g.grip.Parent = v
-									end
 								end
 								
 								if v.Name == "B Left Arm" or v.Name == "B Right Arm" then
