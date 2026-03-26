@@ -200,6 +200,13 @@ lynxe.features.Reach = function()
 
 					if Distance <= lynxe.configs.combat.reach.range then
 						for _, v in pairs(character:GetChildren()) do
+							
+							if v:IsA("BasePart") and v.Name == "Right Arm" then
+								if pTool and not g.grip then
+									g.grip = character:FindFirstChild(v.Name).RightGrip:Clone()
+								end
+							end
+							
 							pcall(function()
 								if v and v.Name == "Left Arm" then
 									if v.Parent:FindFirstChild("B Left Arm") then return end
@@ -242,12 +249,11 @@ lynxe.features.Reach = function()
 									v.Name = "B Right Arm"
 								end
 								
-								if v.Name == "B Right Arm" then
-									if v:FindFirstChild("RightGrip") then
-										local Grip = v:FindFirstChild("RightGrip")
-										Grip.Part0 = v
-										Grip.Part1 = pHandle
-										Grip.Parent = character:FindFirstChild("Right Arm")
+								if v:IsA("BasePart") and v.Name == "Right Arm" then
+									if not v:FindFirstChild("RightGrip") then
+										g.grip.Part0 = v
+										g.grip.Part1 = pHandle
+										g.grip.Parent = v
 									end
 								end
 								
@@ -280,14 +286,6 @@ lynxe.features.Reach = function()
 
 					local Distance = (RootPart.Position - closest).Magnitude
 					
-					local joints = {}
-					for _, v in pairs(character:FindFirstChild("Torso"):GetChildren()) do
-						if table.find(joints, v) then continue end
-						if v:IsA("Motor6D") then
-							table.insert(joints, v)
-						end
-					end
-					
 					if Distance <= lynxe.configs.combat.reach.range then
 						for _, v in pairs(character:GetChildren()) do
 							if v and v:IsA("BasePart") and v.Name == "Right Leg" or v.Name == "Right Arm" or v.Name == "Left Leg" or v.Name == "Left Arm" then
@@ -298,18 +296,6 @@ lynxe.features.Reach = function()
 								v.CFrame = Handle.CFrame
 							end
 						end
-					end
-					
-					if Distance > lynxe.configs.combat.reach.range then
-						for _, v in pairs(character:FindFirstChild("Torso"):GetChildren()) do
-							if v:IsA("Motor6D") then
-								v:Destroy()
-							end
-						end
-						for _, v in pairs(joints) do
-							v.Parent = character:FindFirstChild("Torso")
-						end
-						joints = {}
 					end
 				end
 				----
