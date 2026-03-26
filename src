@@ -23,7 +23,7 @@ lynxe._temp = {}
 -- Configuration/Structure --
 lynxe.configs = {
 	SpoofMethod = "metatable",
-	
+
 	combat = {
 		reach = {
 			enabled = false,
@@ -31,16 +31,16 @@ lynxe.configs = {
 			method = nil,
 			methods = {"TouchInterest", "C-Bring(Streamable)", "C-Bring"}
 		},
-		
+
 		hitbox = {
 			enabled = nil,
 			method = nil,
 			size = {X = 0, Y = 0, Z = 0}
 		}
 	},
-	
+
 	player = {
-		
+
 	}
 }
 
@@ -74,14 +74,14 @@ end
 lynxe.functions.GetTool = function(Tool, Handle)
 	Tool = player.Character:FindFirstChildOfClass("Tool")
 	if not Tool then return end
-	
+
 	Handle = Tool:FindFirstChild("Handle") or Tool:FindFirstChildOfClass("Part")
 	if not Handle then return end
-	
+
 	if Handle then
 		Handle.Massless = true
 		Handle.CanCollide = false
-		
+
 		pcall(function()
 			for i,v in pairs(getconnections(Handle.Changed)) do
 				v:Disconnect()
@@ -106,11 +106,11 @@ lynxe.spoof = function(self, index, property, value)
 	if not self._temp[index] then
 		self._temp[index] = {}
 	end
-	
+
 	if self._temp[index][property] then
 		return { StatusCode = 409, Message = "Resource already exists" }
 	end
-	
+
 	self._temp[index][property] = value
 	return { StatusCode = 200, Message = "Spoof applied" }
 end
@@ -133,12 +133,12 @@ lynxe.features.Reach = function()
 		return	
 	else
 		lynxe.functions.NewConnection("ReachLoop", RunService, "Heartbeat", function()
-			
+
 			local Tool, Handle = lynxe.functions:GetTool()
 			if not Tool or not Handle then warn("Tool or Handle not found") return end
-			
+
 			if lynxe.configs.combat.reach.method == "TouchInterest" then
-				
+
 				local HandlePos = Handle.Position
 				local Forward = Handle.CFrame.LookVector
 
@@ -147,7 +147,7 @@ lynxe.features.Reach = function()
 
 					local character = Player.Character
 					if not character then continue end
-					
+
 					local RootPart = character:FindFirstChild("HumanoidRootPart")
 					if not RootPart then continue end
 
@@ -158,17 +158,17 @@ lynxe.features.Reach = function()
 					local closest = HandlePos + Forward * clamp
 
 					local Distance = (RootPart.Position - closest).Magnitude
-					
-					pcall(function()
+
+					--pcall(function()
 						if Distance <= lynxe.configs.combat.reach.range then
 							firetouchinterest(RootPart, Handle, 0)
 						else
 							firetouchinterest(RootPart, Handle, 1)
 						end 
-					end)
+					--end)
 				end
 			elseif lynxe.configs.combat.reach.method == "C-Bring(Streamable)" then
-				
+
 				local HandlePos = Handle.Position
 				local Forward = Handle.CFrame.LookVector
 
@@ -177,7 +177,7 @@ lynxe.features.Reach = function()
 
 					local character = Player.Character
 					if not character then continue end
-					
+
 					local RootPart = character:FindFirstChild("HumanoidRootPart")
 					if not RootPart then continue end
 
@@ -191,52 +191,57 @@ lynxe.features.Reach = function()
 
 					if Distance <= lynxe.configs.combat.reach.range then
 						for _, v in pairs(character:GetChildren()) do
-							if v:IsA("BasePart") and v.Name == "Left Arm" or v.Name == "Right Arm" then
-								pcall(function()
-									if v and v.Name == "Left Arm" then
-										local LMotor = character:FindFirstChild("Torso")["Left Shoulder"]:Clone()
-										v.Parent = workspace
-										v.CanCollide = false
-										v.Anchored = true
-										v:BreakJoints()
-										
-										local fakeLArm = v:Clone()
-										fakeLArm.Parent = character
-										fakeLArm.Anchored = false
-										LMotor.Part1 = fakeLArm
-										LMotor.Parent = character.Torso
-										
-										v:ClearAllChildren()
-										v.Transparency = 1
-										v.Parent = character
-										v.Name = "B Left Arm"
-										
-									elseif v and v.Name == "Right Arm" then
-										local RMotor = character:FindFirstChild("Torso")["Right Shoulder"]:Clone()
-										v.Parent = workspace
-										v.CanCollide = false
-										v.Anchored = true
-										v:BreakJoints()
-										
-										local fakeRArm = v:Clone()
-										fakeRArm.Parent = character
-										fakeRArm.Anchored = false
-										RMotor.Part1 = fakeRArm
-										RMotor.Parent = character.Torso
-										
-										v:ClearAllChildren()
-										v.Transparency = 1
-										v.Parent = character
-										v.Name = "B Right Arm"
-									end
+							pcall(function()
+								if v and v.Name == "Left Arm" then
+									if v.Parent:FindFirstChild("B Left Arm") then return end
+
+									local LMotor = character:FindFirstChild("Torso")["Left Shoulder"]:Clone()
+									v.Parent = workspace
+									v.CanCollide = false
+									v.Anchored = true
+									v:BreakJoints()
+
+									local fakeLArm = v:Clone()
+									fakeLArm.Parent = character
+									fakeLArm.Anchored = false
+									LMotor.Part1 = fakeLArm
+									LMotor.Parent = character.Torso
+
+									v:ClearAllChildren()
+									v.Transparency = 1
+									v.Parent = character
+									v.Name = "B Left Arm"
+
+								elseif v and v.Name == "Right Arm" then
+									if v.Parent:FindFirstChild("B Right Arm") then return end
+
+									local RMotor = character:FindFirstChild("Torso")["Right Shoulder"]:Clone()
+									v.Parent = workspace
+									v.CanCollide = false
+									v.Anchored = true
+									v:BreakJoints()
+
+									local fakeRArm = v:Clone()
+									fakeRArm.Parent = character
+									fakeRArm.Anchored = false
+									RMotor.Part1 = fakeRArm
+									RMotor.Parent = character.Torso
+
+									v:ClearAllChildren()
+									v.Transparency = 1
+									v.Parent = character
+									v.Name = "B Right Arm"
+								end
+
+								if v.Name == "B Left Arm" or v.Name == "B Right Arm" then
 									v.CFrame = Handle.CFrame
-								end)
-							end
+								end
+							end)
 						end
 					end 
 				end
 			elseif lynxe.configs.combat.reach.method == "C-Bring" then
-				
+
 				local HandlePos = Handle.Position
 				local Forward = Handle.CFrame.LookVector
 
@@ -245,7 +250,7 @@ lynxe.features.Reach = function()
 
 					local character = Player.Character
 					if not character then continue end
-					
+
 					local RootPart = character:FindFirstChild("HumanoidRootPart")
 					if not RootPart then continue end
 
@@ -261,9 +266,9 @@ lynxe.features.Reach = function()
 						for _, v in pairs(character:GetChildren()) do
 							if v and v:IsA("BasePart") and v.Name == "Right Leg" or v.Name == "Right Arm" or v.Name == "Left Leg" or v.Name == "Left Arm" then
 								v:BreakJoints()
-								lynxe:spoof(v, "Anchored", true)
-								lynxe:spoof(v, "CanCollide", false)
-								lynxe:spoof(v, "Transparency", 1)
+								v.Anchored = true
+								v.CanCollide = false
+								v.Transparency = 1
 								v.CFrame = Handle.CFrame
 							end
 						end
