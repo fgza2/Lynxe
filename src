@@ -4,12 +4,11 @@ local r = loadstring(game:HttpGet("https://raw.githubusercontent.com/fgza2/Lynxe
 local t = loadstring(game:HttpGet("https://raw.githubusercontent.com/fgza2/38502375934/refs/heads/main/%5E*)%24%23%26%240943"))(game:GetService("Players").LocalPlayer)
 
 -- Services, Variables -- 
+local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-
 local player = Players.LocalPlayer
-local Character = player.Character or player.CharacterAdded:Wait()
+
 
 g = getgenv()
 
@@ -73,10 +72,10 @@ end
 
 -- Lynxe Functions -- 
 lynxe.functions.GetTool = function(Tool, Handle)
-	Tool = Character:FindFirstChildOfClass("Tool")
+	Tool = player.Character:FindFirstChildOfClass("Tool")
 	if not Tool then return end
 	
-	Handle = Tool:FindFirstChild("Handle")
+	Handle = Tool:FindFirstChild("Handle") or Tool:FindFirstChildOfClass("Part")
 	if not Handle then return end
 	
 	if Handle then
@@ -133,11 +132,10 @@ lynxe.features.Reach = function()
 		end
 		return	
 	else
-		local Tool, Handle = lynxe.functions:GetTool()
-		if not Tool or not Handle then return end
-		
 		lynxe.functions.NewConnection("ReachLoop", RunService, "Heartbeat", function()
-			if not Handle or not Handle.Parent then return end
+			
+			local Tool, Handle = lynxe.functions:GetTool()
+			if not Tool or not Handle then warn("Tool or Handle not found") return end
 			
 			if lynxe.configs.combat.reach.method == "TouchInterest" then
 				
