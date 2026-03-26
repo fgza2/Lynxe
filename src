@@ -73,7 +73,7 @@ end
 
 -- Lynxe Functions -- 
 lynxe.functions.GetTool = function(Tool, Handle)
-	Tool = Character:FindFirstChildOfClass("Tool") or Player.Backpack:FindFirstChildOfClass("Tool")
+	Tool = Character:FindFirstChildOfClass("Tool") or player.Backpack:FindFirstChildOfClass("Tool")
 	Handle = Tool:FindFirstChild("Handle") or Tool:FindFirstChildOfClass("Part")
 	if not Tool or not Handle then return end
 	
