@@ -144,7 +144,9 @@ lynxe.features.Reach = function()
 
 					local character = Player.Character
 					if not character then continue end
+					
 					local RootPart = character:FindFirstChild("HumanoidRootPart")
+					if not RootPart then continue end
 
 					local ToolDistance = (RootPart.Position - HandlePos).Unit
 					local dot = Forward:Dot(ToolDistance)
@@ -153,12 +155,14 @@ lynxe.features.Reach = function()
 					local closest = HandlePos + Forward * clamp
 
 					local Distance = (RootPart.Position - closest).Magnitude
-
-					if Distance <= lynxe.configs.combat.reach.range then
-						firetouchinterest(RootPart, Handle, 0)
-					else
-						firetouchinterest(RootPart, Handle, 1)
-					end 
+					
+					pcall(function()
+						if Distance <= lynxe.configs.combat.reach.range then
+							firetouchinterest(RootPart, Handle, 0)
+						else
+							firetouchinterest(RootPart, Handle, 1)
+						end 
+					end)
 				end
 			elseif lynxe.configs.combat.reach.method == "C-Bring(Streamable)" then
 				
@@ -170,7 +174,9 @@ lynxe.features.Reach = function()
 
 					local character = Player.Character
 					if not character then continue end
+					
 					local RootPart = character:FindFirstChild("HumanoidRootPart")
+					if not RootPart then continue end
 
 					local ToolDistance = (RootPart.Position - HandlePos).Unit
 					local dot = Forward:Dot(ToolDistance)
@@ -250,9 +256,9 @@ lynxe.features.Reach = function()
 						for _, v in pairs(character:GetChildren()) do
 							if v and v:IsA("BasePart") and v.Name == "Right Leg" or v.Name == "Right Arm" or v.Name == "Left Leg" or v.Name == "Left Arm" then
 								v:BreakJoints()
-								lynxe:Spoof(v, "Anchored", true)
-								lynxe:Spoof(v, "CanCollide", false)
-								lynxe:Spoof(v, "Transparency", 1)
+								lynxe:spoof(v, "Anchored", true)
+								lynxe:spoof(v, "CanCollide", false)
+								lynxe:spoof(v, "Transparency", 1)
 								v.CFrame = Handle.CFrame
 							end
 						end
