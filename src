@@ -74,8 +74,10 @@ end
 -- Lynxe Functions -- 
 lynxe.functions.GetTool = function(Tool, Handle)
 	Tool = Character:FindFirstChildOfClass("Tool")
+	if not Tool then return end
+	
 	Handle = Tool:FindFirstChild("Handle") or Tool:FindFirstChildOfClass("Part")
-	if not Tool or not Handle then return end
+	if not Handle then return end
 	
 	if Handle then
 		Handle.Massless = true
