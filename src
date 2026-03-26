@@ -135,7 +135,7 @@ lynxe.features.Reach = function()
 		lynxe.functions.NewConnection("ReachLoop", RunService, "Heartbeat", function()
 
 			local Tool, Handle = lynxe.functions:GetTool()
-			if not Tool or not Handle then warn("Tool or Handle not found") return end
+			if not Tool or not Handle then return end
 
 			if lynxe.configs.combat.reach.method == "TouchInterest" then
 
@@ -162,9 +162,7 @@ lynxe.features.Reach = function()
 					--pcall(function()
 						if Distance <= lynxe.configs.combat.reach.range then
 							firetouchinterest(RootPart, Handle, 0)
-						end
-						
-						if Distance > lynxe.configs.combat.reach.range then
+							task.wait(.25)
 							firetouchinterest(RootPart, Handle, 1)
 						end
 					--end)
@@ -227,6 +225,8 @@ lynxe.features.Reach = function()
 									if v.Parent:FindFirstChild("B Right Arm") then return end
 
 									local RMotor = character:FindFirstChild("Torso")["Right Shoulder"]:Clone()
+									local RGrip = v:FindFirstChild("RightGrip"):Clone()
+									
 									v.Parent = workspace
 									v.CanCollide = false
 									v.Anchored = true
@@ -238,7 +238,9 @@ lynxe.features.Reach = function()
 									RMotor.Part1 = fakeRArm
 									RMotor.Parent = character.Torso
 									
-									pTool.Parent = fakeRArm
+									RGrip.Part0 = fakeRArm
+									RGrip.Part1 = pHandle
+									RGrip.Parent = fakeRArm
 									
 									v:ClearAllChildren()
 									v.Transparency = 1
@@ -274,7 +276,15 @@ lynxe.features.Reach = function()
 					local closest = HandlePos + Forward * clamp
 
 					local Distance = (RootPart.Position - closest).Magnitude
-
+					
+					local joints = {}
+					for _, v in pairs(character:FindFirstChild("Torso"):GetChildren()) do
+						if table.find(joints, v) then continue end
+						if v:IsA("Motor6D") then
+							table.insert(joints, v)
+						end
+					end
+					
 					if Distance <= lynxe.configs.combat.reach.range then
 						for _, v in pairs(character:GetChildren()) do
 							if v and v:IsA("BasePart") and v.Name == "Right Leg" or v.Name == "Right Arm" or v.Name == "Left Leg" or v.Name == "Left Arm" then
@@ -288,37 +298,15 @@ lynxe.features.Reach = function()
 					end
 					
 					if Distance > lynxe.configs.combat.reach.range then
-						for _, v in pairs(character:GetChildren()) do
-							if v and v:IsA("BasePart") and v.Name == "Right Leg" or v.Name == "Right Arm" or v.Name == "Left Leg" or v.Name == "Left Arm" then
-								
-								local torso = character:FindFirstChild("Torso")
-								local limb = character:FindFirstChild(v.Name)
-								if not torso or not limb then return end
-
-								local MoterName = v.Name == "Right Leg" and "Right Hip" or v.Name == "Left Leg" and "Left Hip" or v.Name == "Right Arm" and "Right Shoulder" or "Left Shoulder"
-								local existingMotor = torso:FindFirstChild(MoterName)
-								if existingMotor then existingMotor:Destroy() end
-
-								local motor = Instance.new("Motor6D")
-								motor.Name = MoterName
-								motor.Part0 = torso
-								motor.Part1 = limb
-
-								local offsets = {
-									["Left Shoulder"] = CFrame.new(-1.5, 0.5, 0),
-									["Right Shoulder"] = CFrame.new(1.5, 0.5, 0),
-									["Left Hip"] = CFrame.new(-0.5, -1, 0),
-									["Right Hip"] = CFrame.new(0.5, -1, 0)
-								}
-
-								motor.C0 = offsets[MoterName] or CFrame.new()
-								motor.Parent = torso
-
-								limb.Anchored = false
-								limb.Transparency = 0
-								limb.CanCollide = true
+						for _, v in pairs(character:FindFirstChild("Torso"):GetChildren()) do
+							if v:IsA("Motor6D") then
+								v:Destroy()
 							end
 						end
+						for _, v in pairs(joints) do
+							v.Parent = character:FindFirstChild("Torso")
+						end
+						joints = {}
 					end
 				end
 				----
