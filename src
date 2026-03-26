@@ -242,7 +242,9 @@ lynxe.features.Reach = function()
 
 					local character = Player.Character
 					if not character then continue end
+					
 					local RootPart = character:FindFirstChild("HumanoidRootPart")
+					if not RootPart then continue end
 
 					local ToolDistance = (RootPart.Position - HandlePos).Unit
 					local dot = Forward:Dot(ToolDistance)
