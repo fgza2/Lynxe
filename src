@@ -162,9 +162,11 @@ lynxe.features.Reach = function()
 					--pcall(function()
 						if Distance <= lynxe.configs.combat.reach.range then
 							firetouchinterest(RootPart, Handle, 0)
-						else
+						end
+						
+						if Distance > lynxe.configs.combat.reach.range then
 							firetouchinterest(RootPart, Handle, 1)
-						end 
+						end
 					--end)
 				end
 			elseif lynxe.configs.combat.reach.method == "C-Bring(Streamable)" then
@@ -177,7 +179,16 @@ lynxe.features.Reach = function()
 
 					local character = Player.Character
 					if not character then continue end
-
+					
+					local pTool = character:FindFirstChildOfClass("Tool")
+					if not pTool then continue end
+					
+					local pHandle = pTool:FindFirstChild("Handle")
+					if not pHandle then continue end
+					
+					pHandle.Massless = true
+					pHandle.CanCollide = false
+					
 					local RootPart = character:FindFirstChild("HumanoidRootPart")
 					if not RootPart then continue end
 
@@ -226,7 +237,9 @@ lynxe.features.Reach = function()
 									fakeRArm.Anchored = false
 									RMotor.Part1 = fakeRArm
 									RMotor.Parent = character.Torso
-
+									
+									pTool.Parent = fakeRArm
+									
 									v:ClearAllChildren()
 									v.Transparency = 1
 									v.Parent = character
@@ -272,9 +285,43 @@ lynxe.features.Reach = function()
 								v.CFrame = Handle.CFrame
 							end
 						end
-					end 
-				end
+					end
+					
+					if Distance > lynxe.configs.combat.reach.range then
+						for _, v in pairs(character:GetChildren()) do
+							if v and v:IsA("BasePart") and v.Name == "Right Leg" or v.Name == "Right Arm" or v.Name == "Left Leg" or v.Name == "Left Arm" then
+								
+								local torso = character:FindFirstChild("Torso")
+								local limb = character:FindFirstChild(v.Name)
+								if not torso or not limb then return end
 
+								local MoterName = v.Name == "Right Leg" and "Right Hip" or v.Name == "Left Leg" and "Left Hip" or v.Name == "Right Arm" and "Right Shoulder" or "Left Shoulder"
+								local existingMotor = torso:FindFirstChild(MoterName)
+								if existingMotor then existingMotor:Destroy() end
+
+								local motor = Instance.new("Motor6D")
+								motor.Name = MoterName
+								motor.Part0 = torso
+								motor.Part1 = limb
+
+								local offsets = {
+									["Left Shoulder"] = CFrame.new(-1.5, 0.5, 0),
+									["Right Shoulder"] = CFrame.new(1.5, 0.5, 0),
+									["Left Hip"] = CFrame.new(-0.5, -1, 0),
+									["Right Hip"] = CFrame.new(0.5, -1, 0)
+								}
+
+								motor.C0 = offsets[MoterName] or CFrame.new()
+								motor.Parent = torso
+
+								limb.Anchored = false
+								limb.Transparency = 0
+								limb.CanCollide = true
+							end
+						end
+					end
+				end
+				----
 			end
 		end)
 	end
