@@ -76,7 +76,7 @@ lynxe.functions.GetTool = function(Tool, Handle)
 	Tool = Character:FindFirstChildOfClass("Tool")
 	if not Tool then return end
 	
-	Handle = Tool:FindFirstChild("Handle") or Tool:FindFirstChildOfClass("Part")
+	Handle = Tool:FindFirstChild("Handle")
 	if not Handle then return end
 	
 	if Handle then
