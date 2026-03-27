@@ -37,7 +37,7 @@ lynxe.configs = {
 			method = nil,
 			size = {X = 0, Y = 0, Z = 0}
 		},
-		
+
 		tank = {
 			enabled = false,
 		}
@@ -164,11 +164,11 @@ lynxe.features.Reach = function()
 					local Distance = (RootPart.Position - closest).Magnitude
 
 					--pcall(function()
-						if Distance <= lynxe.configs.combat.reach.range then
-							firetouchinterest(RootPart, Handle, 0)
-							task.wait(.25)
-							firetouchinterest(RootPart, Handle, 1)
-						end
+					if Distance <= lynxe.configs.combat.reach.range then
+						firetouchinterest(RootPart, Handle, 0)
+						task.wait(.25)
+						firetouchinterest(RootPart, Handle, 1)
+					end
 					--end)
 				end
 			elseif lynxe.configs.combat.reach.method == "C-Bring(Streamable)" then
@@ -181,7 +181,7 @@ lynxe.features.Reach = function()
 
 					local character = Player.Character
 					if not character then continue end
-					
+
 					local RootPart = character:FindFirstChild("HumanoidRootPart")
 					if not RootPart then continue end
 
@@ -192,11 +192,11 @@ lynxe.features.Reach = function()
 					local closest = HandlePos + Forward * clamp
 
 					local Distance = (RootPart.Position - closest).Magnitude
-					
+
 					local function SpoofLimb(limbName, motorName, prefix)
 						local limb = character:FindFirstChild(limbName)
 						if not limb then return end
-						
+
 						if character:FindFirstChild(prefix .. " " .. limbName) then return end
 
 						local motor = character.Torso[motorName]:Clone()
@@ -216,16 +216,16 @@ lynxe.features.Reach = function()
 						limb.Parent = character
 						limb.Name = prefix .. " " .. limbName
 					end
-					
+
 					if Distance <= lynxe.configs.combat.reach.range then
 						for _, v in pairs(character:GetChildren()) do
 							pcall(function()
 								if v:IsA("BasePart") and (v.Name == "Right Leg" or v.Name == "Left Leg" or v.Name == "Left Arm") then
-									
+
 									local MotorMap = {["Right Leg"] = "Right Hip", ["Left Leg"] = "Left Hip", ["Left Arm"] = "Left Shoulder"}
 									SpoofLimb(v.Name, MotorMap[v.Name], "O")
 								end
-								
+
 								if v:IsA("BasePart") and (v.Name == "O Right Leg" or v.Name == "O Left Leg" or v.Name == "O Left Arm") then
 									v.CFrame = Handle.CFrame
 								end
@@ -254,7 +254,7 @@ lynxe.features.Reach = function()
 					local closest = HandlePos + Forward * clamp
 
 					local Distance = (RootPart.Position - closest).Magnitude
-					
+
 					if Distance <= lynxe.configs.combat.reach.range then
 						for _, v in pairs(character:GetChildren()) do
 							if v and v:IsA("BasePart") and v.Name == "Right Leg" or v.Name == "Right Arm" or v.Name == "Left Leg" or v.Name == "Left Arm" then
@@ -409,7 +409,7 @@ local TankToggle = AmpAndTank:CreateToggle({
 	Flag = "TankToggle", 
 	Callback = function(Value) 
 		lynxe.configs.combat.tank.enabled = Value
-		lynxe.features.Tank()
+		lynxe.features.tank()
 	end
 })
 
