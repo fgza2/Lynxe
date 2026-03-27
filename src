@@ -200,14 +200,28 @@ lynxe.features.Reach = function()
 
 					if Distance <= lynxe.configs.combat.reach.range then
 						for _, v in pairs(character:GetChildren()) do
-							
-							if v:IsA("BasePart") and v.Name == "Right Arm" then
-								if pTool and not g.grip then
-									g.grip = character:FindFirstChild(v.Name).RightGrip:Clone()
-								end
-							end
-							
 							pcall(function()
+								
+								if character:FindFirstChild("B Right Arm") then
+									local FakeRArm = character:FindFirstChild("Right Arm")
+									local rightGrip = FakeRArm:FindFirstChildOfClass("Weld")
+									
+									if not pTool and rightGrip then
+										rightGrip:Destroy()
+									else
+										local GripWeld = Instance.new("Weld")
+										lynxe.protectInstance(GripWeld)
+										
+										GripWeld.C0 = CFrame.new(0, -1, 0, -90, 0, 0)
+										GripWeld.C1 = CFrame.new(0, 0, -1.7, 0, 90, 90)
+										
+										GripWeld.Part0 = FakeRArm
+										GripWeld.Part1 = pHandle
+										
+										GripWeld.Parent = FakeRArm
+									end
+								end
+								
 								if v and v.Name == "Left Arm" then
 									if v.Parent:FindFirstChild("B Left Arm") then return end
 
@@ -242,12 +256,6 @@ lynxe.features.Reach = function()
 									fakeRArm.Anchored = false
 									RMotor.Part1 = fakeRArm
 									RMotor.Parent = character.Torso
-									
-									if g.grip then
-										g.grip.Part0 = fakeRArm
-										g.grip.Part1 = pHandle
-										g.grip.Parent = fakeRArm
-									end
 									
 									v:ClearAllChildren()
 									v.Transparency = 1
