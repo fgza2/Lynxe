@@ -36,6 +36,10 @@ lynxe.configs = {
 			enabled = nil,
 			method = nil,
 			size = {X = 0, Y = 0, Z = 0}
+		},
+		
+		tank = {
+			enabled = false,
 		}
 	},
 
@@ -269,6 +273,15 @@ lynxe.features.Reach = function()
 	end
 end
 
+lynxe.features.tank = function(self)
+	for _, Part in pairs(player.Character:GetChildren()) do
+		if Part:IsA("BasePart") then
+			lynxe.spoof(Part, "CanTouch", true)
+			Part.CanTouch = lynxe.configs.combat.tank.enabled
+		end
+	end
+end
+
 
 -- UI --
 local Window = lynxelib:CreateWindow({
@@ -386,6 +399,20 @@ local ReachSliderZ = HitboxSection:CreateSlider({
 		lynxe.configs.combat.hitbox.size.Z = Value
 	end
 })
+
+
+local AmpAndTank = CombatTab:CreateSection({ Name = "Tank & Amp" })
+
+local TankToggle = AmpAndTank:CreateToggle({
+	Name = "Tank",
+	CurrentValue = false,
+	Flag = "TankToggle", 
+	Callback = function(Value) 
+		lynxe.configs.combat.tank.enabled = Value
+		lynxe.features.Tank()
+	end
+})
+
 
 
 
