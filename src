@@ -197,74 +197,37 @@ lynxe.features.Reach = function()
 					local closest = HandlePos + Forward * clamp
 
 					local Distance = (RootPart.Position - closest).Magnitude
+					
+					local function SpoofLimb(limbName, motorName, prefix)
+						local limb = character:FindFirstChild(limbName)
+						if not limb then return end
+						
+						if character:FindFirstChild(prefix .. " " .. limbName) then return end
 
+						local motor = character.Torso[motorName]:Clone()
+						limb.Parent = workspace
+						limb.CanCollide = false
+						limb.Anchored = true
+						limb:BreakJoints()
+
+						local fakeLimb = limb:Clone()
+						fakeLimb.Parent = character
+						fakeLimb.Anchored = false
+						motor.Part1 = fakeLimb
+						motor.Parent = character.Torso
+
+						limb:ClearAllChildren()
+						limb.Transparency = 1
+						limb.Parent = character
+						limb.Name = prefix .. " " .. limbName
+					end
+					
 					if Distance <= lynxe.configs.combat.reach.range then
 						for _, v in pairs(character:GetChildren()) do
 							pcall(function()
-								
-								if character:FindFirstChild("B Right Arm") then
-									local FakeRArm = character:FindFirstChild("Right Arm")
-									local rightGrip = FakeRArm:FindFirstChildOfClass("Weld")
-									
-									if not pTool and rightGrip then
-										rightGrip:Destroy()
-									else
-										local GripWeld = Instance.new("Weld")
-										lynxe.protectInstance(GripWeld)
-										
-										GripWeld.C0 = CFrame.new(0, -1, 0, -90, 0, 0)
-										GripWeld.C1 = CFrame.new(0, 0, -1.7, 0, 90, 90)
-										
-										GripWeld.Part0 = FakeRArm
-										GripWeld.Part1 = pHandle
-										
-										GripWeld.Parent = FakeRArm
-									end
-								end
-								
-								if v and v.Name == "Left Arm" then
-									if v.Parent:FindFirstChild("B Left Arm") then return end
-
-									local LMotor = character:FindFirstChild("Torso")["Left Shoulder"]:Clone()
-									v.Parent = workspace
-									v.CanCollide = false
-									v.Anchored = true
-									v:BreakJoints()
-
-									local fakeLArm = v:Clone()
-									fakeLArm.Parent = character
-									fakeLArm.Anchored = false
-									LMotor.Part1 = fakeLArm
-									LMotor.Parent = character.Torso
-
-									v:ClearAllChildren()
-									v.Transparency = 1
-									v.Parent = character
-									v.Name = "B Left Arm"
-
-								elseif v and v.Name == "Right Arm" then
-									if v.Parent:FindFirstChild("B Right Arm") then return end
-
-									local RMotor = character.Torso["Right Shoulder"]:Clone()
-									v.Parent = workspace
-									v.CanCollide = false
-									v.Anchored = true
-									v:BreakJoints()
-
-									local fakeRArm = v:Clone()
-									fakeRArm.Parent = character
-									fakeRArm.Anchored = false
-									RMotor.Part1 = fakeRArm
-									RMotor.Parent = character.Torso
-									
-									v:ClearAllChildren()
-									v.Transparency = 1
-									v.Parent = character
-									v.Name = "B Right Arm"
-								end
-								
-								if v.Name == "B Left Arm" or v.Name == "B Right Arm" then
-									v.CFrame = Handle.CFrame
+								if v:IsA("BasePart") and (v.Name == "Right Leg" or v.Name == "Left Leg" or v.Name == "Left Arm") then
+									local MotorMap = {["Right Leg"] = "Right Hip", ["Left Leg"] = "Left Hip", ["Left Arm"] = "Left Shoulder"}
+									SpoofLimb(v.Name, MotorMap[v.Name], "B")
 								end
 							end)
 						end
