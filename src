@@ -178,15 +178,6 @@ lynxe.features.Reach = function()
 					local character = Player.Character
 					if not character then continue end
 					
-					local pTool = character:FindFirstChildOfClass("Tool")
-					if not pTool then continue end
-					
-					local pHandle = pTool:FindFirstChild("Handle")
-					if not pHandle then continue end
-					
-					pHandle.Massless = true
-					pHandle.CanCollide = false
-					
 					local RootPart = character:FindFirstChild("HumanoidRootPart")
 					if not RootPart then continue end
 
@@ -224,13 +215,17 @@ lynxe.features.Reach = function()
 					
 					if Distance <= lynxe.configs.combat.reach.range then
 						for _, v in pairs(character:GetChildren()) do
-							--pcall(function()
+							pcall(function()
 								if v:IsA("BasePart") and (v.Name == "Right Leg" or v.Name == "Left Leg" or v.Name == "Left Arm") then
 									
 									local MotorMap = {["Right Leg"] = "Right Hip", ["Left Leg"] = "Left Hip", ["Left Arm"] = "Left Shoulder"}
-									SpoofLimb(v.Name, MotorMap[v.Name], "B")
+									SpoofLimb(v.Name, MotorMap[v.Name], "O")
 								end
-							--end)
+								
+								if v:IsA("BasePart") and (v.Name == "O Right Leg" or v.Name == "O Left Leg" or v.Name == "O Left Arm") then
+									v.CFrame = Handle.CFrame
+								end
+							end)
 						end
 					end 
 				end
