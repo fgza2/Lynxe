@@ -224,12 +224,13 @@ lynxe.features.Reach = function()
 					
 					if Distance <= lynxe.configs.combat.reach.range then
 						for _, v in pairs(character:GetChildren()) do
-							pcall(function()
+							--pcall(function()
 								if v:IsA("BasePart") and (v.Name == "Right Leg" or v.Name == "Left Leg" or v.Name == "Left Arm") then
+									
 									local MotorMap = {["Right Leg"] = "Right Hip", ["Left Leg"] = "Left Hip", ["Left Arm"] = "Left Shoulder"}
 									SpoofLimb(v.Name, MotorMap[v.Name], "B")
 								end
-							end)
+							--end)
 						end
 					end 
 				end
